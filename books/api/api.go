@@ -1,39 +1,36 @@
 package api
 
 import (
-	"encoding/json"
+	"books/book.go"
 	"fmt"
 	"net/http"
 	"os"
 )
-
-type Book struct {
-	Title string
-	Author string
-	ISBN string
-}
-
-func ToJson(book Book) []byte {
-	ToJson,err := json.Marshal(book)
-	if err != nil{
-		panic(err)
-	}
-	return ToJson
-}
-
-
 
 func main() {
 	fmt.Println("--------------------- Starting ")
 
 	http.HandleFunc("/", index)
 	http.HandleFunc("/api/echo", echo)
+
+	http.HandleFunc("/api/books", Book)
+
 	if err := http.ListenAndServe(port(), nil); err != nil {
 		fmt.Print(err)
 		return
 	}
 }
 
+func echo(writer http.ResponseWriter, request *http.Request) {
+
+	s := request.URL.Query()["message"][0]
+
+	writer.Header().Add("Accept", "text/plain")
+	writer.WriteHeader(http.StatusOK)
+	if _, err := fmt.Fprintf(writer, s); err != nil {
+		return
+	}
+}
 
 func port() string {
 
